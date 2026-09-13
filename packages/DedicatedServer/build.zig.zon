@@ -1,0 +1,17 @@
+.{
+    .name = .dedicated_server,
+    .version = "0.1.0",
+    .fingerprint = 0x2136f4fa1588f7db,
+
+    .dependencies = .{
+        .nethernet = .{
+            .path = "../NetherNet",
+        },
+    },
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
