@@ -1,0 +1,17 @@
+.{
+    .name = .harbor,
+    .version = "0.1.0",
+    .fingerprint = 0x273c6248d9b2213d,
+
+    .dependencies = .{
+        .dedicated_server = .{
+            .path = "packages/DedicatedServer",
+        },
+    },
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "packages",
+    },
+}
