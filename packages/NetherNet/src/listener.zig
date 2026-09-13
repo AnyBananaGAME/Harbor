@@ -82,7 +82,7 @@ pub const Listener = struct {
         const self: *Self = @ptrCast(@alignCast(context.?));
         if (self.state == .closed) return;
         if (signal.type != .offer) return;
-        if (signal.connection_id != self.connection_id or
+        if ((self.connection_id != 0 and signal.connection_id != self.connection_id) or
             !std.mem.eql(u8, signal.network_id, self.network_id)) return;
         if (self.peer != null) return;
 
@@ -90,6 +90,7 @@ pub const Listener = struct {
             self.fail(err);
             return;
         };
+        if (self.connection_id == 0) self.connection_id = signal.connection_id;
         self.peer = peer;
         peer.onStateChange(self, handleStateChange);
         peer.onDataChannel(self, handleDataChannel);
