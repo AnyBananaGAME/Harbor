@@ -1,0 +1,17 @@
+.{
+    .name = .nethernet,
+    .version = "0.1.0",
+    .fingerprint = 0x8b6cc58f490f28f1,
+
+    .dependencies = .{
+        .webrtc = .{
+            .path = "libs/webrtc",
+        },
+    },
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
