@@ -7,8 +7,11 @@ const State = @import("../transport/peer_connection.zig").State;
 const DataChannel = @import("../transport/channel.zig").DataChannel;
 
 const Handler = webrtc.PeerConnectionHandler;
-const IceCandidate = @typeInfo(@typeInfo(@TypeOf(Handler.VTable.onIceCandidate)).pointer.child).@"fn".params[1].type.?;
-const DataEvent = @typeInfo(@typeInfo(@TypeOf(webrtc.DataChannel.registerCallback)).pointer.child).@"fn".params[2].type;
+const IceCandidateCallback = @FieldType(Handler.VTable, "onIceCandidate");
+const IceCandidateParam = @typeInfo(@typeInfo(IceCandidateCallback).pointer.child).@"fn".params[1].type.?;
+const IceCandidate = @typeInfo(IceCandidateParam).optional.child;
+const DataCallback = @typeInfo(@TypeOf(webrtc.DataChannel.registerCallback)).@"fn".params[2].type.?;
+const DataEvent = @typeInfo(@typeInfo(DataCallback).pointer.child).@"fn".params[2].type.?;
 
 pub const Factory = struct {
     io: std.Io,
@@ -280,19 +283,19 @@ fn onMessage(ptr: *anyopaque, context: ?*anyopaque, callback: DataChannel.Messag
     const self: *Channel = @ptrCast(@alignCast(ptr));
     self.message_context = context;
     self.message_callback = callback;
-    self.channel.registerCallback(self, handleDataEvent);
+    self.channel.registerCallback(self, &handleDataEvent);
 }
 
 fn onOpen(ptr: *anyopaque, context: ?*anyopaque, callback: DataChannel.StateCallback) void {
     const self: *Channel = @ptrCast(@alignCast(ptr));
     self.open_context = context;
     self.open_callback = callback;
-    self.channel.registerCallback(self, handleDataEvent);
+    self.channel.registerCallback(self, &handleDataEvent);
 }
 
 fn onClose(ptr: *anyopaque, context: ?*anyopaque, callback: DataChannel.StateCallback) void {
     const self: *Channel = @ptrCast(@alignCast(ptr));
     self.close_context = context;
     self.close_callback = callback;
-    self.channel.registerCallback(self, handleDataEvent);
+    self.channel.registerCallback(self, &handleDataEvent);
 }
