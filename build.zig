@@ -14,7 +14,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(server_exe);
 
     const run = b.addRunArtifact(server_exe);
-
+    run.setCwd(b.path("packages/DedicatedServer"));
     if (b.args) |args| {
         run.addArgs(args);
     }
