@@ -4,8 +4,8 @@
     .fingerprint = 0x8b6cc58f490f28f1,
 
     .dependencies = .{
-        .webrtc = .{
-            .path = "libs/webrtc",
+        .binarystream = .{
+            .path = "../BinaryStream/src",
         },
     },
 
@@ -13,5 +13,11 @@
         "build.zig",
         "build.zig.zon",
         "src",
+        "native",
+        "libs/libdatachannel/include",
+        "libs/libdatachannel/deps/libjuice/include",
+        "libs/libdatachannel/build/libdatachannel.a",
+        "libs/libdatachannel/build/deps/libjuice/libjuice.a",
+        "libs/libdatachannel/build/deps/usrsctp/usrsctplib/libusrsctp.a",
     },
 }
