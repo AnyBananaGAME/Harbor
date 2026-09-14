@@ -57,6 +57,7 @@ pub const Server = struct {
             var cleaned_length: usize = 0;
             var line_start: usize = 0;
 
+            // An ugly mess i know but i cba to write even more code on this bs
             while (line_start < offer.len) {
                 const line_end =
                     std.mem.indexOfScalarPos(u8, offer, line_start, '\n') orelse offer.len;
