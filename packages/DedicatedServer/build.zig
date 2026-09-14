@@ -15,6 +15,7 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
+            .link_libcpp = false,
         }),
     });
 
@@ -25,7 +26,6 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(exe);
 
     const run = b.addRunArtifact(exe);
-
     if (b.args) |args| {
         run.addArgs(args);
     }

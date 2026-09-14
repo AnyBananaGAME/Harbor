@@ -25,7 +25,7 @@ pub const Server = struct {
         };
     }
 
-    pub fn start(self: *Server, http_address: std.Io.net.IpAddress) !void {
+    pub fn startHttp(self: *Server, http_address: std.Io.net.IpAddress) !void {
         var http = try Http.Server.init(.{
             .io = self.io,
             .allocator = self.allocator,
@@ -37,7 +37,7 @@ pub const Server = struct {
         try http.run();
     }
 
-    pub fn startHttps(self: *Server, http_address: [:0]const u8, certificate_path: [:0]const u8, key_path: [:0]const u8, identity_key_path: [:0]const u8) !void {
+    pub fn start(self: *Server, http_address: [:0]const u8, certificate_path: [:0]const u8, key_path: [:0]const u8, identity_key_path: [:0]const u8) !void {
         if (native.nethernet_https_start(
             http_address.ptr,
             self.port,
