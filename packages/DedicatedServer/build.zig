@@ -4,7 +4,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const nethernet = b.dependency("nethernet", .{
+    const harbor = b.dependency("harbor", .{
         .target = target,
         .optimize = optimize,
     });
@@ -20,8 +20,8 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.root_module.addImport(
-        "NetherNet",
-        nethernet.module("NetherNet"),
+        "Harbor",
+        harbor.module("Harbor"),
     );
     b.installArtifact(exe);
 

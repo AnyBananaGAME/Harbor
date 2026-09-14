@@ -4,8 +4,8 @@
     .fingerprint = 0x2136f4fa1588f7db,
 
     .dependencies = .{
-        .nethernet = .{
-            .path = "../NetherNet",
+        .harbor = .{
+            .path = "../Harbor",
         },
     },
 

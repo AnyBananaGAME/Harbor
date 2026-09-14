@@ -1,0 +1,16 @@
+.{
+    .name = .harbor,
+    .version = "0.1.0",
+    .fingerprint = 0x273c6248bbecc389,
+
+    .dependencies = .{
+        .nethernet = .{ .path = "../NetherNet" },
+        .protocol = .{ .path = "../Protocol" },
+    },
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
