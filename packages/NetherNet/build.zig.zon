@@ -5,7 +5,7 @@
 
     .dependencies = .{
         .binarystream = .{
-            .path = "../BinaryStream/src",
+            .path = "../BinaryStream",
         },
     },
 

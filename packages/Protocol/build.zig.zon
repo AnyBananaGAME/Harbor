@@ -1,0 +1,17 @@
+.{
+    .name = .protocol,
+    .version = "0.1.0",
+    .fingerprint = 0x8b6cc58f290f28f1,
+
+    .dependencies = .{
+        .binarystream = .{
+            .path = "../BinaryStream",
+        },
+    },
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

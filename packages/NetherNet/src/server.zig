@@ -38,7 +38,7 @@ pub const Server = struct {
     }
 
     pub fn start(self: *Server, http_address: [:0]const u8, certificate_path: [:0]const u8, key_path: [:0]const u8, identity_key_path: [:0]const u8) !void {
-        if (native.nethernet_https_start(
+        const result = native.nethernet_https_start(
             http_address.ptr,
             self.port,
             certificate_path.ptr,
@@ -46,7 +46,12 @@ pub const Server = struct {
             identity_key_path.ptr,
             nativeAnswer,
             self,
-        ) != 0) return error.SignalingStartFailed;
+        );
+        switch (result) {
+            0 => {},
+            -5, -7 => return error.PortInUse,
+            else => return error.SignalingStartFailed,
+        }
         while (true) self.io.sleep(.fromSeconds(60), .awake) catch return;
     }
 
@@ -57,7 +62,6 @@ pub const Server = struct {
             var cleaned_length: usize = 0;
             var line_start: usize = 0;
 
-            // An ugly mess i know but i cba to write even more code on this bs
             while (line_start < offer.len) {
                 const line_end =
                     std.mem.indexOfScalarPos(u8, offer, line_start, '\n') orelse offer.len;
@@ -96,7 +100,7 @@ pub const Server = struct {
             const answer_sdp = try session.connection.createAnswer(buffer);
             return answer_sdp;
         }
-        log.warn("join rejected: session table is full", .{});
+        log.warn("join rejected: server is full", .{});
         return error.TooManyConnections;
     }
 };
