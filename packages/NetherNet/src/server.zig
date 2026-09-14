@@ -2,7 +2,7 @@ const std = @import("std");
 const native = @import("native/libdatachannel.zig");
 const Http = @import("signaling/http.zig");
 const session_module = @import("session.zig");
-const log = std.log.scoped(.nethernet_server);
+const session_pool = @import("session_pool.zig");
 
 pub const Handler = session_module.Handler;
 pub const Session = session_module.Session;
@@ -13,7 +13,8 @@ pub const Server = struct {
     bind_address: [:0]const u8,
     port: u16,
     handler: Handler,
-    sessions: [32]?Session = [_]?Session{null} ** 32,
+    pool: session_pool.Pool,
+    session_mutex: std.Io.Mutex = .init,
 
     pub fn init(io: std.Io, allocator: std.mem.Allocator, bind_address: [:0]const u8, port: u16, handler: Handler) Server {
         return .{
@@ -22,6 +23,7 @@ pub const Server = struct {
             .bind_address = bind_address,
             .port = port,
             .handler = handler,
+            .pool = session_pool.Pool.init(allocator),
         };
     }
 
@@ -56,8 +58,11 @@ pub const Server = struct {
     }
 
     pub fn answer(self: *Server, offer: []const u8, buffer: []u8) ![]u8 {
-        for (&self.sessions) |*slot| {
-            if (slot.* != null) continue;
+        try self.session_mutex.lock(self.io);
+        defer self.session_mutex.unlock(self.io);
+
+        while (true) {
+            const slot = try self.pool.acquire();
             var cleaned_offer: [64 * 1024 + 1]u8 = undefined;
             var cleaned_length: usize = 0;
             var line_start: usize = 0;
@@ -92,6 +97,8 @@ pub const Server = struct {
             slot.* = .{
                 .connection = try native.Connection.init("0.0.0.0", 0),
                 .handler = self.handler,
+                .release = releaseSession,
+                .release_context = self,
             };
             const session = &slot.*.?;
             session.callback_state = session.callbacks();
@@ -100,10 +107,15 @@ pub const Server = struct {
             const answer_sdp = try session.connection.createAnswer(buffer);
             return answer_sdp;
         }
-        log.warn("join rejected: server is full", .{});
-        return error.TooManyConnections;
     }
 };
+
+fn releaseSession(context: ?*anyopaque, session: *Session) void {
+    const server: *Server = @ptrCast(@alignCast(context.?));
+    server.session_mutex.lockUncancelable(server.io);
+    defer server.session_mutex.unlock(server.io);
+    server.pool.release(session);
+}
 
 pub fn answerCallback(offer: []const u8, buffer: []u8, user_data: ?*anyopaque) ![]const u8 {
     const server: *Server = @ptrCast(@alignCast(user_data.?));

@@ -9,6 +9,9 @@ pub const Session = struct {
     unreliable: ?c_int = null,
     handler: Handler,
     callback_state: native.Callbacks = .{},
+    release: ?*const fn (?*anyopaque, *Session) void = null,
+    release_context: ?*anyopaque = null,
+    released: bool = false,
 
     fn dataChannel(channel: c_int, label: [*:0]const u8, user_data: ?*anyopaque) callconv(.c) void {
         const session: *Session = @ptrCast(@alignCast(user_data.?));
@@ -24,6 +27,14 @@ pub const Session = struct {
 
     fn closed(_: c_int, _: ?*anyopaque) callconv(.c) void {}
 
+    fn stateChanged(state: c_int, user_data: ?*anyopaque) callconv(.c) void {
+        if (state != 5) return;
+        const session: *Session = @ptrCast(@alignCast(user_data.?));
+        if (session.released) return;
+        session.released = true;
+        if (session.release) |release| release(session.release_context, session);
+    }
+
     fn message(channel: c_int, data: [*]const u8, size: c_int, user_data: ?*anyopaque) callconv(.c) void {
         const session: *Session = @ptrCast(@alignCast(user_data.?));
         if (size >= 0) {
@@ -37,6 +48,7 @@ pub const Session = struct {
             .open = opened,
             .closed = closed,
             .message = message,
+            .state = stateChanged,
             .user_data = self,
         };
     }
