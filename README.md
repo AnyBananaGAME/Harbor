@@ -1,0 +1,1 @@
+# Note! This project is meant to be for fun, rather than long term one(unless i get hooked)
