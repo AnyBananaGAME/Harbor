@@ -1,13 +1,14 @@
 const std = @import("std");
 const native = @import("native/libdatachannel.zig");
 
-pub const Handler = *const fn (session: *Session, channel: c_int, data: []const u8) void;
+pub const Handler = *const fn (context: ?*anyopaque, session: *Session, channel: c_int, data: []const u8) void;
 
 pub const Session = struct {
     connection: native.Connection,
     reliable: ?c_int = null,
     unreliable: ?c_int = null,
     handler: Handler,
+    handler_context: ?*anyopaque = null,
     callback_state: native.Callbacks = .{},
     release: ?*const fn (?*anyopaque, *Session) void = null,
     release_context: ?*anyopaque = null,
@@ -22,7 +23,7 @@ pub const Session = struct {
 
     fn opened(channel: c_int, user_data: ?*anyopaque) callconv(.c) void {
         const session: *Session = @ptrCast(@alignCast(user_data.?));
-        session.handler(session, channel, &.{});
+        session.handler(session.handler_context, session, channel, &.{});
     }
 
     fn closed(_: c_int, _: ?*anyopaque) callconv(.c) void {}
@@ -38,7 +39,7 @@ pub const Session = struct {
     fn message(channel: c_int, data: [*]const u8, size: c_int, user_data: ?*anyopaque) callconv(.c) void {
         const session: *Session = @ptrCast(@alignCast(user_data.?));
         if (size >= 0) {
-            session.handler(session, channel, data[0..@intCast(size)]);
+            session.handler(session.handler_context, session, channel, data[0..@intCast(size)]);
         }
     }
 
