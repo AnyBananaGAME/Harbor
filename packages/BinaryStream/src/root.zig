@@ -27,6 +27,10 @@ pub const BinaryStream = struct {
         };
     }
 
+    pub fn eof(self: *const Self) bool {
+        return self.offset >= self.bytes.len;
+    }
+
     /// Write a byte to the stream.
     /// Automatically increments the offset.
     pub inline fn writeByte(self: *BinaryStream, byte: u8) !void {
