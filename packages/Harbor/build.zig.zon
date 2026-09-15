@@ -4,6 +4,7 @@
     .fingerprint = 0x273c6248bbecc389,
 
     .dependencies = .{
+        .binarystream = .{ .path = "../BinaryStream" },
         .nethernet = .{ .path = "../NetherNet" },
         .protocol = .{ .path = "../Protocol" },
     },

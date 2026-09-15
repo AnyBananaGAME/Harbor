@@ -14,6 +14,10 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    const binary_stream = b.dependency("binarystream", .{
+        .target = target,
+        .optimize = optimize,
+    });
     const protocol = b.dependency("protocol", .{
         .target = target,
         .optimize = optimize,
@@ -21,4 +25,5 @@ pub fn build(b: *std.Build) void {
 
     module.addImport("NetherNet", nethernet.module("NetherNet"));
     module.addImport("Protocol", protocol.module("Protocol"));
+    module.addImport("BinaryStream", binary_stream.module("BinaryStream"));
 }
