@@ -13,16 +13,18 @@ pub const Server = struct {
     bind_address: [:0]const u8,
     port: u16,
     handler: Handler,
+    handler_context: ?*anyopaque = null,
     pool: session_pool.Pool,
     session_mutex: std.Io.Mutex = .init,
 
-    pub fn init(io: std.Io, allocator: std.mem.Allocator, bind_address: [:0]const u8, port: u16, handler: Handler) Server {
+    pub fn init(io: std.Io, allocator: std.mem.Allocator, bind_address: [:0]const u8, port: u16, handler: Handler, handler_context: ?*anyopaque) Server {
         return .{
             .io = io,
             .allocator = allocator,
             .bind_address = bind_address,
             .port = port,
             .handler = handler,
+            .handler_context = handler_context,
             .pool = session_pool.Pool.init(allocator),
         };
     }
@@ -97,6 +99,7 @@ pub const Server = struct {
             slot.* = .{
                 .connection = try native.Connection.init("0.0.0.0", 0),
                 .handler = self.handler,
+                .handler_context = self.handler_context,
                 .release = releaseSession,
                 .release_context = self,
             };
