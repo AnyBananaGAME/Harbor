@@ -1,6 +1,7 @@
 const std = @import("std");
 const NetherNet = @import("NetherNet");
 const BinaryStream = @import("BinaryStream").BinaryStream;
+const Packets = @import("Protocol").Packets;
 
 const Logger = std.log.scoped(.NetworkManager);
 
@@ -33,15 +34,21 @@ pub const NetworkManager = struct {
         );
     }
 
-    pub fn decryptMessage(self: *NetworkManager, stream: *BinaryStream) !void {
-        _ = self;
+    pub fn decryptMessage(_: *NetworkManager, stream: *BinaryStream) !void {
         const compression = try stream.readU8();
         Logger.info("Packet uses {d} compression", .{compression});
 
         while (!stream.eof()) {
             const length = try stream.readVarUint32();
-            const buffer = try stream.readBytes(length);
-            Logger.info("{any}", .{buffer});
+            var packet_stream = BinaryStream.init(try stream.readBytes(length), 0);
+            const id = try packet_stream.readVarUint32();
+            switch (id) {
+                Packets.RequestNetworkSettingsPacket.ID => {
+                    const request = try Packets.RequestNetworkSettingsPacket.deserialize(&packet_stream);
+                    Logger.info("received RequestNetworkSettingsPacket: protocol: {d}", .{request.protocol});
+                },
+                else => return error.UnknownPacketId,
+            }
         }
     }
 };
