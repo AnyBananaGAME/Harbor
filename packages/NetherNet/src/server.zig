@@ -56,7 +56,6 @@ pub const Server = struct {
             -5, -7 => return error.PortInUse,
             else => return error.SignalingStartFailed,
         }
-        while (true) self.io.sleep(.fromSeconds(60), .awake) catch return;
     }
 
     pub fn answer(self: *Server, offer: []const u8, buffer: []u8) ![]u8 {
@@ -102,7 +101,9 @@ pub const Server = struct {
                 .handler_context = self.handler_context,
                 .release = releaseSession,
                 .release_context = self,
+                .reassembler = undefined,
             };
+            slot.*.?.initReassembler();
             const session = &slot.*.?;
             session.callback_state = session.callbacks();
             try session.connection.setCallbacks(&session.callback_state);
