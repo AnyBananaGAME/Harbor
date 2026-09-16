@@ -10,4 +10,6 @@ pub fn main(init: std.process.Init) !void {
 
     var server = harbor.Server.init(threaded.io(), init.gpa);
     try server.start();
+
+    while (true) threaded.io().sleep(.fromSeconds(60), .awake) catch return;
 }
