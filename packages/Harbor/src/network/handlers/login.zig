@@ -62,7 +62,7 @@ fn run(job: *LoginJob) void {
 
     const parse_started = std.Io.Clock.awake.now(job.network.server.io);
 
-    var payload: [16]u8 = undefined;
+    var payload: [128]u8 = undefined;
     var stream = BinaryStream.init(&payload, 0);
     var status = Protocol.Packets.PlayStatusPacket{
         .status = .LoginSuccess,
@@ -83,15 +83,19 @@ fn run(job: *LoginJob) void {
     const parse_finished = std.Io.Clock.awake.now(job.network.server.io);
 
     const serialized = status.serialize(&stream) catch {};
-    job.session.sendReliable(Protocol.Packets.PlayStatusPacket.ID, serialized) catch {};
-
     var player = Player.init(job.session, job.payload);
+
     job.network.server.players.put(player) catch |err| {
         Logger.err("Could not add player: {s}", .{@errorName(err)});
         player.deinit();
         return;
     };
     job.owns_payload = false;
+
+    job.session.sendReliable(Protocol.Packets.PlayStatusPacket.ID, serialized) catch |err| {
+        Logger.err("Could not send PlayStatusPacket: {s}", .{@errorName(err)});
+        return;
+    };
 
     const elapsed = parse_finished.nanoseconds - parse_started.nanoseconds;
     Logger.info("Login parsing took {d} ms", .{@divTrunc(elapsed, std.time.ns_per_ms)});
