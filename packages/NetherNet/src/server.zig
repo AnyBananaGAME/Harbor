@@ -96,12 +96,14 @@ pub const Server = struct {
 
             cleaned_offer[cleaned_length] = 0;
             slot.* = .{
+                .io = self.io,
                 .connection = try native.Connection.init("0.0.0.0", 0),
                 .handler = self.handler,
                 .handler_context = self.handler_context,
                 .release = releaseSession,
                 .release_context = self,
                 .reassembler = undefined,
+                .pool_slot = slot,
             };
             slot.*.?.initReassembler();
             const session = &slot.*.?;

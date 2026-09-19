@@ -7,6 +7,7 @@ pub const StdHttpSignaling = @import("signaling/http.zig");
 pub const LibDataChannel = @import("native/libdatachannel.zig");
 pub const Server = @import("server.zig");
 pub const Session = @import("session.zig").Session;
+pub const OutgoingPacket = @import("session.zig").OutgoingPacket;
 pub const ReliableDataChannel = "ReliableDataChannel";
 pub const UnreliableDataChannel = "UnreliableDataChannel";
 
