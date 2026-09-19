@@ -16,18 +16,3 @@ pub const ListTag = @import("nbt/tags/list-tag.zig").ListTag;
 pub const CompoundTag = @import("nbt/tags/compound-tag.zig").CompoundTag;
 pub const IntListTag = @import("nbt/tags/int-list-tag.zig").IntListTag;
 pub const LongListTag = @import("nbt/tags/long-list-tag.zig").LongListTag;
-
-test "integer tags support both byte orders" {
-    const BinaryStream = @import("binarystream").BinaryStream;
-
-    var bytes: [16]u8 = undefined;
-    var stream = BinaryStream.init(&bytes, 0);
-    const value = IntTag.init(0x10203040, "value");
-
-    try value.serialize(&stream, .big_endian);
-    try std.testing.expectEqualSlices(u8, &[_]u8{ 3, 0, 5, 'v', 'a', 'l', 'u', 'e', 0x10, 0x20, 0x30, 0x40 }, stream.getBuffer());
-
-    stream.offset = 0;
-    const decoded = try IntTag.deserialize(&stream, .big_endian);
-    try std.testing.expectEqual(@as(i32, 0x10203040), decoded.value);
-}

@@ -32,16 +32,7 @@ pub const Pool = struct {
     }
 
     pub fn release(self: *Pool, session: *Session) void {
-        var block = self.first;
-        while (block) |current| : (block = current.next) {
-            for (&current.slots) |*slot| {
-                if (slot.*) |*value| {
-                    if (value == session) {
-                        slot.* = null;
-                        return;
-                    }
-                }
-            }
-        }
+        _ = self;
+        if (session.pool_slot) |slot| slot.* = null;
     }
 };

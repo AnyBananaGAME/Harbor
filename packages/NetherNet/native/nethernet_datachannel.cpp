@@ -4,6 +4,11 @@
 #include <rtc/rtc.h>
 
 #include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <deque>
+#include <vector>
+#include <atomic>
 #include <string>
 #include <cstring>
 #include <cstdlib>
@@ -30,6 +35,35 @@ struct Peer {
     volatile long description_ready = 0;
     volatile long gathering_complete = 0;
 };
+
+struct OutgoingMessage {
+    int channel;
+    std::vector<char> data;
+};
+
+static std::mutex outgoing_mutex;
+static std::condition_variable outgoing_condition;
+static std::deque<OutgoingMessage> outgoing_messages;
+static std::atomic<bool> outgoing_worker_started = false;
+
+static void outgoing_worker() {
+    for (;;) {
+        OutgoingMessage message;
+        {
+            std::unique_lock lock(outgoing_mutex);
+            outgoing_condition.wait(lock, [] { return !outgoing_messages.empty(); });
+            message = std::move(outgoing_messages.front());
+            outgoing_messages.pop_front();
+        }
+
+        rtcSendMessage(message.channel, message.data.data(), static_cast<int>(message.data.size()));
+    }
+}
+
+static void start_outgoing_worker() {
+    if (outgoing_worker_started.exchange(true)) return;
+    std::thread(outgoing_worker).detach();
+}
 
 static void RTC_API rtc_log(rtcLogLevel level, const char *message) {
     (void)level;
@@ -466,7 +500,18 @@ int nethernet_datachannel_set_callbacks(nethernet_datachannel_peer handle, const
 }
 
 int nethernet_datachannel_send(int channel, const void *data, int size) {
-    return rtcSendMessage(channel, static_cast<const char *>(data), size);
+    if (!data || size <= 0) return RTC_ERR_INVALID;
+
+    start_outgoing_worker();
+    {
+        std::lock_guard lock(outgoing_mutex);
+        outgoing_messages.push_back({
+            channel,
+            std::vector<char>(static_cast<const char *>(data), static_cast<const char *>(data) + size),
+        });
+    }
+    outgoing_condition.notify_one();
+    return RTC_ERR_SUCCESS;
 }
 
 int nethernet_datachannel_channel_label(int channel, char *buffer, int size) {

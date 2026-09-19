@@ -42,7 +42,20 @@ pub const NetworkManager = struct {
         else
             null;
 
-        Logger.info("Packet uses {any} compression", .{compression orelse .None});
+        var decompressed_storage: [128 * 1024]u8 = undefined;
+        if (compression == .Zlib) {
+            const compressed = stream.bytes[stream.offset..];
+            var compressed_reader = std.Io.Reader.fixed(compressed);
+            var window: [std.compress.flate.max_window_len]u8 = undefined;
+            var decompressor = std.compress.flate.Decompress.init(
+                &compressed_reader,
+                .raw,
+                &window,
+            );
+            var output = std.Io.Writer.fixed(&decompressed_storage);
+            _ = try decompressor.reader.streamRemaining(&output);
+            stream.* = BinaryStream.init(decompressed_storage[0..output.end], 0);
+        }
 
         while (!stream.eof()) {
             const length = try stream.readVarUint32();
@@ -57,16 +70,52 @@ pub const NetworkManager = struct {
                         .clientThreshold = 0,
                         .clientThrottle = false,
                         .compressionMethod = .Zlib,
-                        .compressionThreshold = 0,
+                        .compressionThreshold = 1,
                     };
 
                     var payload: [256]u8 = undefined;
                     var payload_stream = BinaryStream.init(&payload, 0);
                     _ = try settings.serialize(&payload_stream);
                     try session.sendUncompressed(channel, Packets.NetworkSettingsPacket.ID, payload_stream.getBuffer());
-                    session.compression = 0;
+                    session.compression = @intFromEnum(CompressionMethod.Zlib);
                 },
                 Packets.LoginPacket.ID => try @import("./handlers/login.zig").handle(self, &packet_stream, session),
+                Packets.ClientCacheStatusPacket.ID => {
+                    const cache = try Packets.ClientCacheStatusPacket.deserialize(&packet_stream);
+                    _ = cache; // autofix
+
+                    var rpInfo = Protocol.Packets.ResourcePacksInfoPacket{
+                        .force_disable_vibrant_visuals = false,
+                        .has_addon_packs = false,
+                        .has_scripts = false,
+                        .resource_pack_required = false,
+                        .resource_packs = &.{},
+                        .world_template_id_and_version = .{
+                            .pack_uuid = [_]u8{0} ** 16,
+                            .pack_version = "",
+                        },
+                    };
+
+                    var payload2: [256]u8 = undefined;
+                    var stream2 = BinaryStream.init(&payload2, 0);
+                    const rpInfoSerialized = rpInfo.serialize(&stream2) catch return;
+
+                    session.sendReliable(
+                        Protocol.Packets.ResourcePacksInfoPacket.ID,
+                        rpInfoSerialized,
+                    ) catch |err| {
+                        Logger.err("Could not send ResourcePacksInfoPacket: {s}", .{@errorName(err)});
+                        return;
+                    };
+                },
+                Packets.ResourcePackClientResponsePacket.ID => {
+                    try @import("./handlers/resource-pack-client-response.zig").handle(
+                        self,
+                        &packet_stream,
+                        session,
+                    );
+                },
+                Packets.PacketViolationWarningPacket.ID => try @import("./handlers/packet-violation-warning.zig").handle(self, &packet_stream),
                 else => {
                     Logger.warn("Unknown packet ID {d}", .{id});
                     return;

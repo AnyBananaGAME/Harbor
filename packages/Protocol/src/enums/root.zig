@@ -1,6 +1,7 @@
 pub const CompressionMethod = @import("compression-method.zig").CompressionMethod;
 pub const GameType = @import("game-type.zig").GameType;
 pub const GeneratorType = @import("generator-type.zig").GeneratorType;
+pub const DimensionType = @import("dimension-type.zig").DimensionType;
 pub const Difficulty = @import("difficulty.zig").Difficulty;
 pub const EditorWorldType = @import("editor-world-type.zig").EditorWorldType;
 pub const EducationEditionOffer = @import("education-edition-offer.zig").EducationEditionOffer;
