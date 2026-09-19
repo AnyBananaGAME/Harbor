@@ -7,6 +7,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    const nbt = b.dependency("nbt", .{ .target = target, .optimize = optimize });
 
     const mod = b.addModule("Protocol", .{
         .root_source_file = b.path("src/root.zig"),
@@ -17,4 +18,5 @@ pub fn build(b: *std.Build) void {
     });
 
     mod.addImport("binarystream", binaryStream.module("BinaryStream"));
+    mod.addImport("Nbt", nbt.module("Nbt"));
 }

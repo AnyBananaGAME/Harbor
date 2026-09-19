@@ -1,2 +1,16 @@
 pub const CompressionMethod = @import("compression-method.zig").CompressionMethod;
+pub const GameType = @import("game-type.zig").GameType;
+pub const GeneratorType = @import("generator-type.zig").GeneratorType;
+pub const Difficulty = @import("difficulty.zig").Difficulty;
+pub const EditorWorldType = @import("editor-world-type.zig").EditorWorldType;
+pub const EducationEditionOffer = @import("education-edition-offer.zig").EducationEditionOffer;
+pub const GamePublishSetting = @import("game-publish-setting.zig").GamePublishSetting;
+pub const PlayerPermissionLevel = @import("player-permission-level.zig").PlayerPermissionLevel;
+pub const ChatRestrictionLevel = @import("chat-restriction-level.zig").ChatRestrictionLevel;
+pub const SpawnBiomeType = @import("spawn-biome-type.zig").SpawnBiomeType;
+pub const ServerEditorConnectionPolicy = @import("server-editor-connection-policy.zig").ServerEditorConnectionPolicy;
+pub const GameRuleValueType = @import("game-rule-value-type.zig").GameRuleValueType;
 pub const PlayStatus = @import("play-status.zig").PlayStatus;
+pub const ResourcePackResponse = @import("resource-pack-response.zig").ResourcePackResponse;
+pub const PacketViolationType = @import("packet-violation-type.zig").PacketViolationType;
+pub const PacketViolationSeverity = @import("packet-violation-severity.zig").PacketViolationSeverity;

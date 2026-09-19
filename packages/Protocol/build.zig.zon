@@ -7,6 +7,9 @@
         .binarystream = .{
             .path = "../BinaryStream",
         },
+        .nbt = .{
+            .path = "../Nbt",
+        },
     },
 
     .paths = .{
