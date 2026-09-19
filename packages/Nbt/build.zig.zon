@@ -1,0 +1,15 @@
+.{
+    .name = .nbt,
+    .version = "0.1.0",
+    .fingerprint = 0xbdab8338a75bc383,
+    .dependencies = .{
+        .binarystream = .{
+            .path = "../BinaryStream",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
