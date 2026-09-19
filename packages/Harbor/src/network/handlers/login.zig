@@ -13,7 +13,7 @@ pub fn handle(
     stream: *BinaryStream,
     session: *NetherNet.Server.Session,
 ) !void {
-    if (network.server.players.get(session) != null) return;
+    if (network.server.getPlayerBySession(session) != null) return;
 
     const handle_started = std.Io.Clock.awake.now(network.server.io);
     defer {
@@ -85,18 +85,21 @@ fn run(job: *LoginJob) void {
     const serialized = status.serialize(&stream) catch {};
     var player = Player.init(job.session, job.payload);
 
-    job.network.server.players.put(player) catch |err| {
-        Logger.err("Could not add player: {s}", .{@errorName(err)});
-        player.deinit();
-        return;
-    };
-    job.owns_payload = false;
+    if (job.network.server.getDefaultWorld()) |world| {
+        world.players.put(player) catch |err| {
+            Logger.err("Could not add player: {s}", .{@errorName(err)});
+            player.deinit();
+            return;
+        };
 
-    job.session.sendReliable(Protocol.Packets.PlayStatusPacket.ID, serialized) catch |err| {
-        Logger.err("Could not send PlayStatusPacket: {s}", .{@errorName(err)});
-        return;
-    };
+        job.owns_payload = false;
 
-    const elapsed = parse_finished.nanoseconds - parse_started.nanoseconds;
-    Logger.info("Login parsing took {d} ms", .{@divTrunc(elapsed, std.time.ns_per_ms)});
+        job.session.sendReliable(Protocol.Packets.PlayStatusPacket.ID, serialized) catch |err| {
+            Logger.err("Could not send PlayStatusPacket: {s}", .{@errorName(err)});
+            return;
+        };
+
+        const elapsed = parse_finished.nanoseconds - parse_started.nanoseconds;
+        Logger.info("Login parsing took {d} ms", .{@divTrunc(elapsed, std.time.ns_per_ms)});
+    }
 }

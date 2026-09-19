@@ -8,3 +8,4 @@ pub const PlayerMap = @import("player/player-map.zig").PlayerMap;
 pub const NetworkManager = @import("network/manager.zig").NetworkManager;
 
 pub const World = @import("world/root.zig").World;
+pub const Dimension = @import("world/root.zig").Dimension;
