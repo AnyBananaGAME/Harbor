@@ -13,6 +13,7 @@ pub const NetworkPermissions = @import("network-permissions.zig").NetworkPermiss
 pub const ServerTelemetryData = @import("server-telemetry-data.zig").ServerTelemetryData;
 pub const SpawnSettings = @import("spawn-settings.zig").SpawnSettings;
 pub const BlockPos = @import("block-pos.zig").BlockPos;
+pub const ChunkPos = @import("chunk-pos.zig").ChunkPos;
 pub const GameRule = @import("game-rule.zig").GameRule;
 pub const GameRulesChangedPacketData = @import("game-rules-changed-packet-data.zig").GameRulesChangedPacketData;
 pub const LevelSettings = @import("level-settings.zig").LevelSettings;

@@ -9,3 +9,4 @@ pub const NetworkManager = @import("network/manager.zig").NetworkManager;
 
 pub const World = @import("world/root.zig").World;
 pub const Dimension = @import("world/root.zig").Dimension;
+pub const Chunk = @import("world/root.zig").Chunk;
