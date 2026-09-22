@@ -18,3 +18,5 @@ pub const LevelChunkPacket = @import("./level-chunk.zig");
 pub const NetworkChunkPublisherUpdatePacket = @import("./network-chunk-publisher-update.zig");
 pub const RequestChunkRadiusPacket = @import("./request-chunk-radius.zig");
 pub const ChunkRadiusUpdatedPacket = @import("./chunk-radius-updated.zig");
+pub const UpdateAttributesPacket = @import("./update-attributes.zig");
+pub const SetActorDataPacket = @import("./set-actor-data.zig");

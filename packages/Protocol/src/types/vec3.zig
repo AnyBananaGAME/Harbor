@@ -10,4 +10,12 @@ pub const Vec3 = struct {
         try stream.writeF32(self.y, .little);
         try stream.writeF32(self.z, .little);
     }
+
+    pub fn read(stream: *BinaryStream) !@This() {
+        return .{
+            .x = try stream.readF32(.little),
+            .y = try stream.readF32(.little),
+            .z = try stream.readF32(.little),
+        };
+    }
 };

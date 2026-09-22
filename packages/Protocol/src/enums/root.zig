@@ -15,3 +15,4 @@ pub const PlayStatus = @import("play-status.zig").PlayStatus;
 pub const ResourcePackResponse = @import("resource-pack-response.zig").ResourcePackResponse;
 pub const PacketViolationType = @import("packet-violation-type.zig").PacketViolationType;
 pub const PacketViolationSeverity = @import("packet-violation-severity.zig").PacketViolationSeverity;
+pub const ActorDataType = @import("actor-data-type.zig").ActorDataType;
