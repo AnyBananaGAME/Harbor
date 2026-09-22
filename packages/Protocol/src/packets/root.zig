@@ -14,3 +14,7 @@ pub const PacketViolationWarningPacket = @import("./packet-violation-warning.zig
 pub const StartGamePacket = @import("./start-game.zig").StartGamePacket;
 pub const JigsawStructureDataPacket = @import("./jigsaw-structure-data.zig").JigsawStructureDataPacket;
 pub const VoxelShapesPacket = @import("./voxel-shapes.zig").VoxelShapesPacket;
+pub const LevelChunkPacket = @import("./level-chunk.zig");
+pub const NetworkChunkPublisherUpdatePacket = @import("./network-chunk-publisher-update.zig");
+pub const RequestChunkRadiusPacket = @import("./request-chunk-radius.zig");
+pub const ChunkRadiusUpdatedPacket = @import("./chunk-radius-updated.zig");

@@ -10,4 +10,12 @@ pub const BlockPos = struct {
         try stream.writeVarInt32(self.y);
         try stream.writeVarInt32(self.z);
     }
+
+    pub fn read(stream: *BinaryStream) !@This() {
+        return .{
+            .x = try stream.readVarInt32(),
+            .y = try stream.readVarInt32(),
+            .z = try stream.readVarInt32(),
+        };
+    }
 };
