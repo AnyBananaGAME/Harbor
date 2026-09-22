@@ -6,6 +6,7 @@ const Protocol = @import("Protocol");
 const LoginPayload = Protocol.LoginFlow.LoginPayload;
 const Session = @import("NetherNet").Session;
 const ChunkViewer = @import("chunk-viewer.zig").PlayerChunkView;
+const Entity = @import("../entity/entity.zig").Entity;
 
 pub const Player = struct {
     /// Nethernet session of the player.
@@ -17,11 +18,15 @@ pub const Player = struct {
     /// Chunk viewer of the player.
     chunk_viewer: ChunkViewer,
 
+    /// The actor of the player.
+    actor: Entity,
+
     pub fn init(session: *Session, login: LoginPayload) Player {
         return .{
             .session = session,
             .login = login,
             .chunk_viewer = ChunkViewer{},
+            .actor = Entity.init(),
         };
     }
 
@@ -29,11 +34,23 @@ pub const Player = struct {
         self.login.deinit();
     }
 
+    /// Returns the username of the player.
     pub fn getUsername(self: *const Player) []const u8 {
         return self.login.identity.xname;
     }
 
+    /// Returns the xuid of the player.
     pub fn getXuid(self: *const Player) []const u8 {
         return self.login.identity.xid;
+    }
+
+    /// Returns the unique id of the player.
+    pub fn getUniqueId(self: *const Player) i64 {
+        return self.actor.unique_id;
+    }
+
+    /// Returns the runtime id of the player.
+    pub fn getRuntimeId(self: *const Player) u64 {
+        return self.actor.runtime_id;
     }
 };

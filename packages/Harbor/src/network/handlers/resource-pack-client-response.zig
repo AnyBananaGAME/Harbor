@@ -12,6 +12,8 @@ pub fn handle(
     stream: *BinaryStream,
     session: *NetherNet.Server.Session,
 ) !void {
+    const player = network.server.getPlayerBySession(session) orelse return;
+
     const response = try Protocol.Packets.ResourcePackClientResponsePacket.deserialize(
         stream,
         network.server.allocator,
@@ -45,10 +47,8 @@ pub fn handle(
         var start_game_buffer: [128 * 1024]u8 = undefined;
         var start_game_stream = BinaryStream.init(&start_game_buffer, 0);
         var start_game = Protocol.Packets.StartGamePacket{
-            // TODO: Entity.getNextRuntimeId or sum
-            .entity_id = 1,
-            // TODO: Entity.getNextRuntimeId or sum
-            .runtime_id = 1,
+            .entity_id = player.getUniqueId(),
+            .runtime_id = player.getRuntimeId(),
             .enable_item_stack_net_manager = true,
             .block_network_ids_are_hashes = true,
             .level_id = "Harbor",
