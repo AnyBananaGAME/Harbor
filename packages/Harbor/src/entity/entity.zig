@@ -1,9 +1,12 @@
+const std = @import("std");
 const Protocol = @import("Protocol");
 
 const ActorFlags = @import("./metadata/flags.zig").ActorFlags;
 const ActorId = @import("./metadata/actor-id.zig");
-const EntityIdentifier = Protocol.Enums.EntityIdentifier;
 const ActorDataId = Protocol.Enums.ActorDataId;
+const Dimension = @import("../world/dimension.zig").Dimension;
+const ActorAttributes = @import("./metadata/attributes.zig").ActorAttributes;
+const EntityIdentifier = Protocol.Enums.EntityIdentifier;
 
 pub const Entity = struct {
     /// The unique id of the entity.
@@ -21,7 +24,14 @@ pub const Entity = struct {
     /// The entity position.
     position: Protocol.Types.Vec3,
 
+    /// The dimension containing the entity.
+    dimension: *Dimension,
+
+    /// The attributes of the entity.
+    attributes: ActorAttributes,
+
     pub fn init(
+        dimension: *Dimension,
         identifier: []const u8,
     ) Entity {
         return .{
@@ -30,10 +40,12 @@ pub const Entity = struct {
             .flags = ActorFlags.init(),
             .identifier = identifier,
             .position = .{},
+            .dimension = dimension,
+            .attributes = ActorAttributes.init(),
         };
     }
 
-    pub fn onSpawn(self: *Entity, dimension: anytype) !void {
+    pub fn onSpawn(self: *Entity) !void {
         self.flags.setFlag(.Breathing, true);
         self.flags.setFlag(.HasGravity, true);
 
@@ -54,11 +66,19 @@ pub const Entity = struct {
         var buffer: [4096]u8 = undefined;
         var stream = @import("BinaryStream").BinaryStream.init(&buffer, 0);
         const payload = try packet.serialize(&stream);
-        try dimension.broadcast(
+        try self.dimension.broadcast(
             self.position,
             Protocol.Packets.SetActorDataPacket.ID,
             payload,
             .{},
         );
+
+        if (std.mem.eql(u8, self.identifier, EntityIdentifier.Player.toString())) {
+            self.attributes.set(.Movement, 0, 3.4028235e+38, 0.1, 0.1);
+            self.attributes.set(.UnderwaterMovement, 0, 3.4028235e+38, 0.02, 0.02);
+            self.attributes.set(.LavaMovement, 0, 3.4028235e+38, 0.02, 0.02);
+        }
+
+        try self.attributes.broadcast(self);
     }
 };

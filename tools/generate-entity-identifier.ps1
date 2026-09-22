@@ -41,23 +41,23 @@ foreach ($name in $names) {
     $lines.Add("    $name,")
 }
 $lines.Add("    _,")
-$lines.Add("};")
 $lines.Add('')
-$lines.Add('pub fn toString(self: EntityIdentifier) []const u8 {')
+$lines.Add('    pub fn toString(self: EntityIdentifier) []const u8 {')
 $lines.Add('    return switch (self) {')
 foreach ($entry in $entries) {
     $lines.Add("        .$($entry.Name) => `"$($entry.Identifier)`",")
 }
-$lines.Add('        ._ => "",')
+$lines.Add('        else => "",')
 $lines.Add('    };')
-$lines.Add('}')
+$lines.Add('    }')
 $lines.Add('')
-$lines.Add('pub fn fromString(value: []const u8) ?EntityIdentifier {')
+$lines.Add('    pub fn fromString(value: []const u8) ?EntityIdentifier {')
 foreach ($entry in $entries) {
-    $lines.Add("    if (std.mem.eql(u8, value, `"$($entry.Identifier)`")) return .$($entry.Name);")
+    $lines.Add("        if (std.mem.eql(u8, value, `"$($entry.Identifier)`")) return .$($entry.Name);")
 }
-$lines.Add('    return null;')
-$lines.Add('}')
+$lines.Add('        return null;')
+$lines.Add('    }')
+$lines.Add('};')
 
 $parent = Split-Path -Parent $OutputPath
 New-Item -ItemType Directory -Force $parent | Out-Null

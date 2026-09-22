@@ -83,9 +83,9 @@ fn run(job: *LoginJob) void {
     const parse_finished = std.Io.Clock.awake.now(job.network.server.io);
 
     const serialized = status.serialize(&stream) catch {};
-    var player = Player.init(job.session, job.payload);
-
     if (job.network.server.getDefaultWorld()) |world| {
+        const dimension = world.getDimension("overworld") orelse return;
+        var player = Player.init(job.session, job.payload, dimension);
         world.players.put(player) catch |err| {
             Logger.err("Could not add player: {s}", .{@errorName(err)});
             player.deinit();

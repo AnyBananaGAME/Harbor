@@ -7,6 +7,7 @@ const LoginPayload = Protocol.LoginFlow.LoginPayload;
 const Session = @import("NetherNet").Session;
 const ChunkViewer = @import("chunk-viewer.zig").PlayerChunkView;
 const Entity = @import("../entity/entity.zig").Entity;
+const Dimension = @import("../world/dimension.zig").Dimension;
 
 pub const Player = struct {
     /// Nethernet session of the player.
@@ -21,12 +22,12 @@ pub const Player = struct {
     /// The actor of the player.
     actor: Entity,
 
-    pub fn init(session: *Session, login: LoginPayload) Player {
+    pub fn init(session: *Session, login: LoginPayload, dimension: *Dimension) Player {
         var player = Player{
             .session = session,
             .login = login,
             .chunk_viewer = ChunkViewer{},
-            .actor = Entity.init("minecraft:player"),
+            .actor = Entity.init(dimension, "minecraft:player"),
         };
 
         player.actor.flags.setFlag(.AlwaysShowName, true);
