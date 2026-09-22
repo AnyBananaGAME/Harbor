@@ -45,7 +45,9 @@ pub fn handle(
         var start_game_buffer: [128 * 1024]u8 = undefined;
         var start_game_stream = BinaryStream.init(&start_game_buffer, 0);
         var start_game = Protocol.Packets.StartGamePacket{
+            // TODO: Entity.getNextRuntimeId or sum
             .entity_id = 1,
+            // TODO: Entity.getNextRuntimeId or sum
             .runtime_id = 1,
             .enable_item_stack_net_manager = true,
             .block_network_ids_are_hashes = true,
@@ -57,6 +59,8 @@ pub fn handle(
                 .rewind_history_size = 0,
                 .server_authoritative_block_breaking = true,
             },
+            // TODO: getSpawn point from world
+            .position = .{ .x = 0, .y = 68, .z = 0 },
             .settings = .{
                 .game_type = .Survival,
                 .generator_type = .Overworld,

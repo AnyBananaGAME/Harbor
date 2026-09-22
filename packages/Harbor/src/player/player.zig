@@ -5,13 +5,24 @@
 const Protocol = @import("Protocol");
 const LoginPayload = Protocol.LoginFlow.LoginPayload;
 const Session = @import("NetherNet").Session;
+const ChunkViewer = @import("chunk-viewer.zig").PlayerChunkView;
 
 pub const Player = struct {
+    /// Nethernet session of the player.
     session: *Session,
+
+    /// Login payload of the player that is sent in login packet
     login: LoginPayload,
 
+    /// Chunk viewer of the player.
+    chunk_viewer: ChunkViewer,
+
     pub fn init(session: *Session, login: LoginPayload) Player {
-        return .{ .session = session, .login = login };
+        return .{
+            .session = session,
+            .login = login,
+            .chunk_viewer = ChunkViewer{},
+        };
     }
 
     pub fn deinit(self: *Player) void {

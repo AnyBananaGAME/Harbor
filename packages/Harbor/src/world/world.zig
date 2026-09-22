@@ -4,6 +4,7 @@ const Protocol = @import("Protocol");
 const DimensionType = Protocol.Enums.DimensionType;
 const PlayerMap = @import("../player/player-map.zig").PlayerMap;
 const Dimension = @import("./dimension.zig").Dimension;
+const Generator = @import("./generator/generator.zig").Generator;
 
 pub const World = struct {
     /// The allocator that the world instance uses,
@@ -55,12 +56,17 @@ pub const World = struct {
     /// will return an error if the dimension already exists.
     /// Will return unreachable if the dimension could not be created.
     /// which should never happen... Unless you are out of RAM?
-    pub fn createDimension(self: *World, identifier: []const u8, dimension_type: DimensionType) !*Dimension {
+    pub fn createDimension(
+        self: *World,
+        identifier: []const u8,
+        dimension_type: DimensionType,
+        generator: Generator,
+    ) !*Dimension {
         if (self.getDimension(identifier)) |_| {
             return error.DimensionAlreadyExists;
         }
 
-        const dimension = try Dimension.init(self.allocator, identifier, dimension_type);
+        const dimension = try Dimension.init(self.allocator, identifier, dimension_type, generator);
         try self.dimensions.put(self.allocator, identifier, dimension);
         return self.dimensions.getPtr(identifier) orelse unreachable;
     }

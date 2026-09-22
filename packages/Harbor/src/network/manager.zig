@@ -80,7 +80,9 @@ pub const NetworkManager = struct {
                     session.compression = @intFromEnum(CompressionMethod.Zlib);
                 },
                 Packets.LoginPacket.ID => try @import("./handlers/login.zig").handle(self, &packet_stream, session),
+                Packets.RequestChunkRadiusPacket.ID => try @import("./handlers/request-chunk-radius.zig").handle(self, &packet_stream, session),
                 Packets.ClientCacheStatusPacket.ID => {
+                    // TODO: add a handler here
                     const cache = try Packets.ClientCacheStatusPacket.deserialize(&packet_stream);
                     _ = cache; // autofix
 
