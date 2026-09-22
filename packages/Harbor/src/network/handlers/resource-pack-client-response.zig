@@ -75,6 +75,12 @@ pub fn handle(
         const start_game_payload = try start_game.serialize(&start_game_stream);
         try session.sendReliable(Protocol.Packets.StartGamePacket.ID, start_game_payload);
 
+        player.actor.position = start_game.position;
+        if (network.server.getDefaultWorld()) |world| {
+            if (world.getDimension("overworld")) |dimension|
+                try player.actor.onSpawn(dimension);
+        }
+
         var play_status_buffer: [16]u8 = undefined;
         var play_status_stream = BinaryStream.init(&play_status_buffer, 0);
         var play_status = Protocol.Packets.PlayStatusPacket{ .status = .PlayerSpawn };

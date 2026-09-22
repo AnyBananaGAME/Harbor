@@ -22,12 +22,18 @@ pub const Player = struct {
     actor: Entity,
 
     pub fn init(session: *Session, login: LoginPayload) Player {
-        return .{
+        var player = Player{
             .session = session,
             .login = login,
             .chunk_viewer = ChunkViewer{},
-            .actor = Entity.init(),
+            .actor = Entity.init("minecraft:player"),
         };
+
+        player.actor.flags.setFlag(.AlwaysShowName, true);
+        player.actor.flags.setFlag(.Breathing, true);
+        player.actor.flags.setFlag(.HasGravity, true);
+
+        return player;
     }
 
     pub fn deinit(self: *Player) void {

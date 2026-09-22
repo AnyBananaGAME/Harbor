@@ -66,7 +66,13 @@ pub const World = struct {
             return error.DimensionAlreadyExists;
         }
 
-        const dimension = try Dimension.init(self.allocator, identifier, dimension_type, generator);
+        const dimension = try Dimension.init(
+            self.allocator,
+            identifier,
+            dimension_type,
+            generator,
+            &self.players,
+        );
         try self.dimensions.put(self.allocator, identifier, dimension);
         return self.dimensions.getPtr(identifier) orelse unreachable;
     }
