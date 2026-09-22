@@ -17,3 +17,5 @@ pub const PacketViolationType = @import("packet-violation-type.zig").PacketViola
 pub const PacketViolationSeverity = @import("packet-violation-severity.zig").PacketViolationSeverity;
 pub const ActorDataType = @import("actor-data-type.zig").ActorDataType;
 pub const ActorFlag = @import("actor-flag.zig").ActorFlag;
+pub const ActorDataId = @import("actor-data-id.zig").ActorDataId;
+pub const EntityIdentifier = @import("entity-identifier.zig").EntityIdentifier;
